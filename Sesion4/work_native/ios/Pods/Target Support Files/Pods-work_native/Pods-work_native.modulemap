@@ -1,0 +1,6 @@
+module Pods_work_native {
+  umbrella header "Pods-work_native-umbrella.h"
+
+  export *
+  module * { export * }
+}
