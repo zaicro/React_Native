@@ -8,7 +8,7 @@ import * as yup from 'yup'
 import CInput from '../components/CInput'
 import { ROOT, MAIN } from '../../constants/styles'
 import axios from 'axios';
-import Store from '../../store/store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Login() {
   const [loading, setLoading] = useState();
@@ -28,15 +28,13 @@ export default function Login() {
     try {
       await axios
         .get(`https://erp.dichter-neira.com/Api/ReactNative/v1/Authenticate?userName=${emailUser}&password=${passwordUser}`)
-        .then((response) => {
+        .then(async (response) => {
           let json = response.data;
           if (json.code === '000') {
             let result = json.result;
             if (result.is_authenticate) {
-              Store.setItem(
-                { key: "user_id", value: result.user_id },
-                { key: "jwt", value: result.jwt }
-              );
+              await AsyncStorage.setItem('@user_id', result.user_id);
+              await AsyncStorage.setItem('@jwt', result.jwt);
               navigation.navigate('DrawerNavigation');
             }
             else {

@@ -8,16 +8,14 @@ import { ROOT, MAIN } from '../constants/styles'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faHome, faClipboardUser, faGear, faArrowRightArrowLeft, faNavicon } from '@fortawesome/free-solid-svg-icons'
 import { useNavigation } from '@react-navigation/native';
-import Store from '../store/store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Drawer = createDrawerNavigator();
 
 function Logout(props) {
   const navigation = useNavigation();
-  const handleClose = () => {
-    Store.remove({
-      key: 'userLogin',
-    });
+  const handleClose = async () => {
+    await AsyncStorage.clear()
     navigation.navigate('Login');
   };
   return (

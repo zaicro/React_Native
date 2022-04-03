@@ -1,46 +1,31 @@
 import React, { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faLocationDot } from '@fortawesome/free-solid-svg-icons'
+import { faLocationDot, faPhone, faEnvelope, faBuilding } from '@fortawesome/free-solid-svg-icons'
 import { ROOT } from '../../constants/styles'
 import axios from 'axios';
-import Store from '../../store/store';
 import { Card } from 'react-native-elements'
-import {
-  FlatList,
-  Image,
-  ImageBackground,
-  Platform,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native'
-import Email from '../components/CEmail'
-import Tel from '../components/CTel'
-
-
-
+import { FlatList, Image, Platform, StyleSheet, Text, View, } from 'react-native'
+import CPerfilInfo from '../components/CPerfilInfo'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function PerfilScreen() {
-  const [userId, setuserId] = useState(
-    Store.getItem({ key: 'user_id' }) || ''
-  );
-  const [token, setToken] = useState(
-    Store.getItem({ key: 'jwt' }) || ''
-  );
+  const [userId, setuserId] = useState();
+  const [token, setToken] = useState();
   const [info, setInfo] = useState();
   const [eMails, setEMails] = useState();
   const [telephones, setTelephones] = useState();
 
   useEffect(() => {
-    let _userId = '419';
-    let _token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IkZpbmFuemFzIiwiVXNlciI6IkZpbmFuemFzIiwibmJmIjoxNjI4Mzc1Njk1LCJleHAiOjE2NTk5MTE2OTUsImlhdCI6MTYyODM3NTY5NSwiaXNzIjoiaHR0cHM6Ly9lcnAuZGljaHRlci1uZWlyYS5jb20iLCJhdWQiOiJodHRwczovL2VycC5kaWNodGVyLW5laXJhLmNvbSJ9.HqJZRJT6KxgA4xKJzqZ25nDVS04KfsMR_zw0klvCfYk';
-
     const fetchData = async () => {
+      const user_id = await AsyncStorage.getItem('@user_id');
+      const jwt = await AsyncStorage.getItem('@jwt');
+      setuserId(user_id);
+      setToken(jwt);
       await axios
-        .get(`https://erp.dichter-neira.com/Api/ReactNative/v1/User/${_userId}`,
+        .get(`https://erp.dichter-neira.com/Api/ReactNative/v1/User/${userId}`,
           {
             headers: {
-              'Authorization': `Bearer ${_token}`
+              'Authorization': `Bearer ${token}`
             }
           })
         .then((response) => {
@@ -64,60 +49,62 @@ export default function PerfilScreen() {
   }, []);
 
 
-  renderHeader = (props) => {
+  renderHeader = () => {
     return (
-      <View style={styles.headerContainer}>
-          <View style={styles.headerColumn}>
-            <Image
-              style={styles.userImage}
-              source={{ uri: 'https://e7.pngegg.com/pngimages/676/170/png-clipart-cartoon-business-man-cartoon-characters-illustration.png' }}
-            />
-            <Text style={styles.userNameText}>{info.SmallName}</Text>
-            <View style={styles.userAddressRow}>
-              <View>
-                <FontAwesomeIcon icon={faLocationDot} size={20} color='gray' />
-              </View>
-              <View style={styles.userCityRow}>
-                <Text style={styles.userCityText}>
-                  Bogotá, Colombia
-                </Text>
-              </View>
+      <View>
+        <View style={styles.headerColumn}>
+          <Image
+            style={styles.userImage}
+            source={{ uri: `data:image/png;base64,${info.photo}` }}
+          />
+          <Text style={styles.userNameText}>{info.SmallName}</Text>
+          <View style={styles.userAddressRow}>
+            <View>
+              <FontAwesomeIcon icon={faBuilding} size={20} color={ROOT.dn_azul} />
+            </View>
+            <View>
+              <Text style={styles.userCityText}>
+                {info.position}
+              </Text>
             </View>
           </View>
+          <View style={styles.userAddressRow}>
+            <View>
+              <FontAwesomeIcon icon={faLocationDot} size={20} color={ROOT.dn_success} />
+            </View>
+            <View>
+              <Text style={styles.userCityText}>
+                {`${info.resident_city}, ${info.resident_country}`}
+              </Text>
+            </View>
+          </View>
+        </View>
       </View>
-    )
-  }
+    );
+  };
   renderTel = () => (
-    <FlatList
-      data={telephones}
+    <FlatList data={telephones}
       renderItem={(list) => {
         const { name, number } = list.item
         return (
-          <Tel
-            name={name}
-            number={number}
-          />
+          <CPerfilInfo fontAwesomeIcon={faPhone} descripcion={name} informacion={number} />
         )
       }}
     />
-  )
+  );
   renderEmail = () => (
-    <FlatList
-      data={eMails}
+    <FlatList data={eMails}
       renderItem={(list) => {
         const { name, email } = list.item
         return (
-          <Email
-            name={name}
-            email={email}
-          />
+          <CPerfilInfo fontAwesomeIcon={faEnvelope} descripcion={name} informacion={email} />
         )
       }}
     />
   );
 
   return (
-    <Card style={styles.container}>
+    <Card containerStyle={{ borderRadius: ROOT.border_radius }} style={styles.container}>
       {this.renderHeader()}
       {this.renderTel()}
       {this.renderEmail()}
@@ -133,7 +120,8 @@ const styles = StyleSheet.create({
     backgroundColor: ROOT.dn_blanco
   },
   headerColumn: {
-    backgroundColor: 'transparent',
+    backgroundColor: '#E4F4Fd',
+    borderRadius: ROOT.border_radius,
     ...Platform.select({
       ios: {
         alignItems: 'center',
@@ -149,25 +137,19 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 26,
   },
-  telContainer: {
-    backgroundColor: '#FFF',
-    flex: 1,
-    paddingTop: 30,
-  },
   userAddressRow: {
     alignItems: 'center',
     flexDirection: 'row',
-  },
-  userCityRow: {
-    backgroundColor: 'transparent',
+    marginBottom: 10
   },
   userCityText: {
-    color: '#A5A5A5',
-    fontSize: 15,
-    fontWeight: '600',
+    color: '#4E4E4E',
+    fontSize: 14,
+    fontWeight: '300',
     textAlign: 'center',
   },
   userImage: {
+    marginTop: 10,
     borderColor: '#FFF',
     borderRadius: 85,
     borderWidth: 3,
@@ -176,10 +158,11 @@ const styles = StyleSheet.create({
     width: 170,
   },
   userNameText: {
-    color: '#FFF',
-    fontSize: 22,
+    color: '#000',
+    fontSize: 20,
     fontWeight: 'bold',
     paddingBottom: 8,
     textAlign: 'center',
+    margin: 10
   },
 })

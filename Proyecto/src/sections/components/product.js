@@ -2,10 +2,11 @@ import React from 'react';
 import 'react-native-gesture-handler';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { Card } from 'react-native-elements' //https://reactnativeelements.com/docs/2.3.2/card
+import {ROOT} from '../../constants/styles'
 
 function Product(props) {
   return (
-    <Card>
+    <Card containerStyle={{borderRadius: ROOT.border_radius}}>
       <Card.Title>{props.product.title}</Card.Title>
       <Card.Divider />
       <View style={styles.user}>
