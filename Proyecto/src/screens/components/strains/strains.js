@@ -1,40 +1,30 @@
-import {SafeAreaView, Text} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import {connect} from 'react-redux';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React from 'react';
+import { View, Text, ImageBackground, StyleSheet } from 'react-native';
 
-const getData = async () => {
-  try {
-    const value = await AsyncStorage.getItem('friend');
-    if (value !== null) {
-      // value previously stored
-      console.log(value);
-      return value;
-    }
-  } catch (e) {
-    // error reading value
-  }
-};
-
-const Strains = props => {
-  const [strain, setStrain] = useState('');
-
-  useEffect(() => {
-    async function loadStorage() {
-      setStrain(await getData());
-    }
-    loadStorage();
-  }, []);
+export default function Strains() {
   return (
-    <SafeAreaView>
-      <Text>{strain}</Text>
-    </SafeAreaView>
+    <View style={styles.container}>
+      <ImageBackground source={'https://upload.wikimedia.org/wikipedia/commons/1/1e/SITIO-EN-CONSTRUCCION.jpg'} resizeMode="cover" style={styles.image}>
+        <Text style={styles.text}>En construcción</Text>
+      </ImageBackground>
+    </View>
   );
 };
 
-const mapStateToProps = state => {
-  const {friends} = state;
-  return {friends};
-};
-
-export default connect(mapStateToProps)(Strains);
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  image: {
+    flex: 1,
+    justifyContent: "center"
+  },
+  text: {
+    color: "white",
+    fontSize: 42,
+    lineHeight: 84,
+    fontWeight: "bold",
+    textAlign: "center",
+    backgroundColor: "#000000c0"
+  }
+});

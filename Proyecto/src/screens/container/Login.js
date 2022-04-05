@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, Image, TouchableOpacity, Alert } from 'react-native';
 import 'react-native-gesture-handler';
-import Spinner from 'react-native-loading-spinner-overlay';
 import { useNavigation } from '@react-navigation/native';
 import { Formik, Field } from 'formik'
 import * as yup from 'yup'
 import CInput from '../components/CInput'
 import { ROOT, MAIN } from '../../constants/styles'
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import CLoading from '../components/CLoading'
 
 export default function Login() {
   const [loading, setLoading] = useState();
@@ -33,8 +33,9 @@ export default function Login() {
           if (json.code === '000') {
             let result = json.result;
             if (result.is_authenticate) {
-              await AsyncStorage.setItem('@user_id', result.user_id);
-              await AsyncStorage.setItem('@jwt', result.jwt);
+              await AsyncStorage.setItem('@user_id', `${result.user_id}`);
+              await AsyncStorage.setItem('@jwt', `${result.jwt}`);
+              setLoading(false);
               navigation.navigate('DrawerNavigation');
             }
             else {
@@ -45,6 +46,7 @@ export default function Login() {
                   { text: "OK", onPress: () => console.log("OK Pressed") }
                 ]
               );
+              setLoading(false);
             }
           }
           else
@@ -52,7 +54,6 @@ export default function Login() {
         });
     } catch (error) {
       console.error(error);
-    } finally {
       setLoading(false);
     }
   }
@@ -89,11 +90,7 @@ export default function Login() {
                 disabled={!isValid}
                 style={styles.button}>
                 {loading ? (
-                  <Spinner
-                    visible={true}
-                    textContent={'Loading...'}
-                    textStyle={styles.spinnerTextStyle}
-                  />
+                  <CLoading />
                 ) : (
                   <Text style={styles.buttonLabel}>Iniciar Sesión</Text>
                 )}
@@ -111,9 +108,6 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     marginTop: -200,
     marginBottom: 10
-  },
-  spinnerTextStyle: {
-    color: ROOT.dn_blanco,
   },
   image: {
     flex: 1,

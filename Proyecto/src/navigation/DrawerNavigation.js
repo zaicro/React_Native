@@ -1,12 +1,11 @@
 import React from 'react';
-import { View, StyleSheet, Image, Text, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity } from 'react-native'
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 import NavigationTab from './NavigationTab';
 import PerfilScreen from '../screens/container/PerfilScreen';
-import ConfiguracionScreen from '../screens/container/ConfiguracionScreen';
-import { ROOT, MAIN } from '../constants/styles'
+import { ROOT } from '../constants/styles'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faHome, faClipboardUser, faGear, faArrowRightArrowLeft, faNavicon } from '@fortawesome/free-solid-svg-icons'
+import { faHome, faClipboardUser, faNavicon } from '@fortawesome/free-solid-svg-icons'
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -57,14 +56,6 @@ export default function DrawerNavigator() {
         options={{
           drawerIcon: () => <FontAwesomeIcon icon={faClipboardUser} />,
           headerTitle: () => <Text style={styles.headerTitle}>Perfil</Text>
-        }}
-      />
-      <Drawer.Screen
-        name="Configuracion"
-        component={ConfiguracionScreen}
-        options={{
-          drawerIcon: () => <FontAwesomeIcon icon={faGear} />,
-          headerTitle: () => <Text style={styles.headerTitle}>Detalle</Text>
         }}
       />
     </Drawer.Navigator>

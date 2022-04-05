@@ -57,7 +57,7 @@ const TabLayout = () => {
         }}
       />
       <Tab.Screen
-        name="Strains"
+        name="Desprendibles"
         component={StrainsScreen}
         options={{
           headerShown: false,

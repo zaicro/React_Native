@@ -6,43 +6,65 @@ import axios from 'axios';
 import { Card } from 'react-native-elements'
 import { FlatList, Image, Platform, StyleSheet, Text, View, } from 'react-native'
 import CPerfilInfo from '../components/CPerfilInfo'
+import CLoading from '../components/CLoading'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function PerfilScreen() {
-  const [userId, setuserId] = useState();
-  const [token, setToken] = useState();
-  const [info, setInfo] = useState();
+  const [loading, setLoading] = useState();
+  const [info, setInfo] = useState({
+    "id": 0,
+    "document_user": null,
+    "SmallName": null,
+    "birth_date": null,
+    "birth_country": null,
+    "resident_country": null,
+    "resident_city": null,
+    "telephone": null,
+    "address": null,
+    "gender": null,
+    "personal_email": null,
+    "business_email": null,
+    "number_children": null,
+    "civil_status": null,
+    "blood_type": null,
+    "name_chief": null,
+    "position": null,
+    "date_admission": null,
+    "contract_type": null,
+    "name_office": null,
+    "photo": null
+  });
   const [eMails, setEMails] = useState();
   const [telephones, setTelephones] = useState();
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       const user_id = await AsyncStorage.getItem('@user_id');
       const jwt = await AsyncStorage.getItem('@jwt');
-      setuserId(user_id);
-      setToken(jwt);
       await axios
-        .get(`https://erp.dichter-neira.com/Api/ReactNative/v1/User/${userId}`,
+        .get(`https://erp.dichter-neira.com/Api/ReactNative/v1/User/${user_id}`,
           {
             headers: {
-              'Authorization': `Bearer ${token}`
+              'Authorization': `Bearer ${jwt}`
             }
           })
         .then((response) => {
           let json = response.data
           if (json.code === '000') {
-            setInfo(json.result[0]);
+            setInfo(json.result);
             setEMails([
-              { email: info.personal_email, name: 'Personal' },
-              { email: info.business_email, name: 'Oficina' }
+              { email: json.result.personal_email, name: 'Personal' },
+              { email: json.result.business_email, name: 'Oficina' }
             ]);
             setTelephones([
-              { number: info.telephone, name: 'Personal' }
+              { number: json.result.telephone, name: 'Personal' }
             ]);
           }
           else
             console.error(json.error)
         });
+      setLoading(false);
     };
     fetchData()
       .catch(console.error);;
@@ -52,34 +74,40 @@ export default function PerfilScreen() {
   renderHeader = () => {
     return (
       <View>
-        <View style={styles.headerColumn}>
-          <Image
-            style={styles.userImage}
-            source={{ uri: `data:image/png;base64,${info.photo}` }}
-          />
-          <Text style={styles.userNameText}>{info.SmallName}</Text>
-          <View style={styles.userAddressRow}>
-            <View>
-              <FontAwesomeIcon icon={faBuilding} size={20} color={ROOT.dn_azul} />
+        {loading ? (
+          <CLoading />
+        ) : (
+          <View style={styles.headerColumn}>
+            <Image
+              style={styles.userImage}
+              source={{
+                uri: `data:image/png;base64,${info.photo}`
+              }}
+            />
+            <Text style={styles.userNameText}>{info.SmallName}</Text>
+            <View style={styles.userAddressRow}>
+              <View>
+                <FontAwesomeIcon icon={faBuilding} size={20} color={ROOT.dn_azul} />
+              </View>
+              <View>
+                <Text style={styles.userCityText}>
+                  {info.position}
+                </Text>
+              </View>
             </View>
-            <View>
-              <Text style={styles.userCityText}>
-                {info.position}
-              </Text>
-            </View>
-          </View>
-          <View style={styles.userAddressRow}>
-            <View>
-              <FontAwesomeIcon icon={faLocationDot} size={20} color={ROOT.dn_success} />
-            </View>
-            <View>
-              <Text style={styles.userCityText}>
-                {`${info.resident_city}, ${info.resident_country}`}
-              </Text>
-            </View>
-          </View>
-        </View>
-      </View>
+            <View style={styles.userAddressRow}>
+              <View>
+                <FontAwesomeIcon icon={faLocationDot} size={20} color={ROOT.dn_success} />
+              </View>
+              <View>
+                <Text style={styles.userCityText}>
+                  {`${info.resident_city}, ${info.resident_country}`}
+                </Text>
+              </View>
+            </View >
+          </View >
+        )}
+      </View >
     );
   };
   renderTel = () => (
@@ -93,6 +121,7 @@ export default function PerfilScreen() {
     />
   );
   renderEmail = () => (
+
     <FlatList data={eMails}
       renderItem={(list) => {
         const { name, email } = list.item

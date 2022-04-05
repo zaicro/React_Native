@@ -7,15 +7,15 @@ import {ROOT} from '../../constants/styles'
 function Product(props) {
   return (
     <Card containerStyle={{borderRadius: ROOT.border_radius}}>
-      <Card.Title>{props.product.title}</Card.Title>
+      <Card.Title>{props.product.nombre}</Card.Title>
       <Card.Divider />
       <View style={styles.user}>
         <Image
           style={styles.image}
           resizeMode="cover"
-          source={{ uri: props.product.image }}
+          source={{ uri: props.product.imagen }}
         />
-        <Text style={styles.name}>{props.product.details}</Text>
+        <Text style={styles.name}>{props.product.descripcion}</Text>
       </View>
     </Card>
   )

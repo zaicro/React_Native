@@ -1,21 +1,48 @@
-import React, { useState, Fragment } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 import Product from '../../sections/components/product';
 import Empty from '../../components/Empty';
 import Separator from '../../components/vertical-separator';
 import Layout from '../../components/ProducListLayout';
 import { FlatList } from 'react-native';
-
-const array = [
-  { id: 1, title: 'De regreso ...', details: 'Historia N°1', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-DcRBlecJp3bIuYbwGuv2E6nA33FE2hNNWg&usqp=CAU' },
-  { id: 2, title: 'Canasta CAM', details: 'Historia N°2', image: 'https://dichter-neira.com/wp-content/uploads/2021/08/Post-consumo-2-trimestre-2021.png' },
-  { id: 3, title: 'StoreTrack', details: 'Historia N°3', image: 'https://dichter-neira.com/wp-content/uploads/2020/09/2020-09-StoreTrack_v1-C.png' },
-];
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export default function Home(props) {
-  const [products, setProducts] = useState(array);
+  const [loading, setLoading] = useState();
+  const [stories, setStories] = useState([
+    {
+      "id": 0,
+      "nombre": null,
+      "descripcion": null,
+      "imagen": null,
+      "usuario": null,
+      "usuario_crea": null,
+      "fecha_crea": null
+    }]);
   const itemSeparator = () => <Separator />;
   const keyExtractor = item => item.id.toString();
   const renderEmpty = () => <Empty text="No hay sugerencias" />;
+
+  useEffect(() => {
+    setLoading(true);
+    const fetchData = async () => {
+      setLoading(true);
+      const jwt = await AsyncStorage.getItem('@jwt');
+      const [p1] = await Promise.all([
+        axios.get(`https://erp.dichter-neira.com/Api/ReactNative/V1/Stories`,
+          {
+            headers: {
+              'Authorization': `Bearer ${jwt}`
+            }
+          })
+      ]);
+      setStories(p1.data.result);
+      setLoading(false);
+    };
+    fetchData()
+      .catch(console.error);;
+  }, []);
+
   const renderItem = ({ item }) => {
     return (
       <Product
@@ -30,7 +57,7 @@ export default function Home(props) {
     <Fragment>
       <Layout>
         <FlatList
-          data={products}
+          data={stories}
           ItemSeparatorComponent={itemSeparator}
           ListEmptyComponent={renderEmpty}
           keyExtractor={keyExtractor}
